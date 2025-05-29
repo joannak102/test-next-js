@@ -6,6 +6,8 @@ import {
   CardActions,
   CardContent,
   Typography,
+  ToggleButtonGroup,
+  ToggleButton
 } from "@mui/material";
 
 export default function todo(): any {
@@ -27,6 +29,8 @@ export default function todo(): any {
     }[]
   >([]);
 
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   useEffect(() => {
     fetch("https://dummyjson.com/todos")
       .then((res) => res.json())
@@ -36,8 +40,14 @@ export default function todo(): any {
       });
   }, []);
 
+  useEffect(() => {
+    if (statusFilter) {
+      filterByState(statusFilter);
+    }
+  }, [statusFilter]);
+
   const filterByState = (state: string): void => {
-     if (state === "completed") {
+    if (state === "completed") {
       settodos(allTodos.current.filter((todo) => todo.completed));
     } else if (state === "pending") {
       settodos(allTodos.current.filter((todo) => !todo.completed));
@@ -47,33 +57,35 @@ export default function todo(): any {
   };
 
   const deleteTask = (id: number): void => {
-     const index = allTodos.current.findIndex(todo => todo.id === id);
+    const index = allTodos.current.findIndex(todo => todo.id === id);
     if (index !== -1) {
       allTodos.current.splice(index, 1);
       settodos([...allTodos.current]);
     }
   }
 
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newStatusFilter: string,
+  ) => {
+    setStatusFilter(newStatusFilter);
+  };
+
   return (
     <span>
-      <div className="button-group">
-          <button 
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
-            onClick={() =>filterByState('completed')}
-          >
-              Show Completed
-          </button>
-          <button 
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
-            onClick={() =>filterByState('pending')}>
-              Show Pending
-          </button>
-          <button 
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
-             onClick={() =>filterByState('all')}>
-              Show All
-          </button>
-      </div>
+      <ToggleButtonGroup
+        className="mb-8"
+        color="primary"
+        value={statusFilter}
+        exclusive
+        onChange={handleChange}
+        aria-label="Platform"
+      >
+        <ToggleButton value="completed">Completed</ToggleButton>
+        <ToggleButton value="pending">Pending</ToggleButton>
+        <ToggleButton value="all">All</ToggleButton>
+      </ToggleButtonGroup>
+
       <div className="todo-list">
         {todos.map((todo) => (
           <Card
@@ -89,7 +101,7 @@ export default function todo(): any {
             <CardActions>
               <Button 
                 size="small"
-                 onClick={() =>deleteTask(todo.id)}
+                onClick={() =>deleteTask(todo.id)}
               >Delete</Button>
             </CardActions>
           </Card>
