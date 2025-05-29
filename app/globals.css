@@ -24,3 +24,21 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.top-bar {
+  display: flex;
+  width: 100%;
+  background-color: aliceblue;
+  padding: 10px;
+  gap: 8px;
+}
+
+.content {
+  padding: 25px;
+}
+
+.todo-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
