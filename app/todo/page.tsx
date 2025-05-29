@@ -91,7 +91,7 @@ export default function todo(): any {
           <Card
             key={todo.id}
             sx={{ maxWidth: 345 }}
-            style={{ background: todo.completed ? "green" : "white" }}
+            style={{ background: todo.completed ? "lightgreen" : "white" }}
           >
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
