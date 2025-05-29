@@ -1,16 +1,10 @@
 "use client";
-import React, { useRef } from "react";
-import { useEffect, useState } from "react";
-import List from "@mui/material/List";
+import { useRef, useEffect, useState } from "react";
 import {
-  ListSubheader,
-  ListItemText,
-  ListItem,
   Button,
   Card,
   CardActions,
   CardContent,
-  CardMedia,
   Typography,
 } from "@mui/material";
 
@@ -42,11 +36,48 @@ export default function todo(): any {
       });
   }, []);
 
+  const filterByState = (state: string): void => {
+     if (state === "completed") {
+      settodos(allTodos.current.filter((todo) => todo.completed));
+    } else if (state === "pending") {
+      settodos(allTodos.current.filter((todo) => !todo.completed));
+    } else {
+      settodos(allTodos.current);
+    }
+  };
+
+  const deleteTask = (id: number): void => {
+     const index = allTodos.current.findIndex(todo => todo.id === id);
+    if (index !== -1) {
+      allTodos.current.splice(index, 1);
+      settodos([...allTodos.current]);
+    }
+  }
+
   return (
     <span>
+      <div className="button-group">
+          <button 
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
+            onClick={() =>filterByState('completed')}
+          >
+              Show Completed
+          </button>
+          <button 
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
+            onClick={() =>filterByState('pending')}>
+              Show Pending
+          </button>
+          <button 
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4  border border-blue-500 hover:border-transparent rounded-full"
+             onClick={() =>filterByState('all')}>
+              Show All
+          </button>
+      </div>
       <div className="todo-list">
         {todos.map((todo) => (
           <Card
+            key={todo.id}
             sx={{ maxWidth: 345 }}
             style={{ background: todo.completed ? "green" : "white" }}
           >
@@ -56,8 +87,10 @@ export default function todo(): any {
               </Typography>
             </CardContent>
             <CardActions>
-              <Button size="small">Share</Button>
-              <Button size="small">Learn More</Button>
+              <Button 
+                size="small"
+                 onClick={() =>deleteTask(todo.id)}
+              >Delete</Button>
             </CardActions>
           </Card>
         ))}
