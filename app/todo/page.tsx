@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useTransition } from "react";
 import {
   Button,
   Card,
@@ -11,7 +11,7 @@ import {
   CircularProgress
 } from "@mui/material";
 
-export default function todo(): any {
+export default function Todo() {
   const allTodos = useRef<
     {
       id: number;
@@ -31,24 +31,29 @@ export default function todo(): any {
   >([]);
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [loading, setLoading] = useState<boolean>(true);
+
+
+ const [isLoading, startTransition] = useTransition();
+
+  const getData = () => {
+  
+   startTransition(async () => {
+    try {
+      const res = await fetch("https://dummyjson.com/todos");
+      const resp = await res.json();
+
+      allTodos.current = resp.todos;
+      settodos(allTodos.current);
+
+      return
+    } catch (error) {
+      console.log(error);
+      return
+    }
+  })}
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetch("https://dummyjson.com/todos")
-        .then((res) => res.json())
-        .then((resp) => {
-          allTodos.current = resp.todos;
-          settodos(allTodos.current);
-        })
-        .catch((error) => {
-        console.error("Failed to fetch todos:", error);
-      })
-      .finally(() => {
-        setLoading(false); // Stop loading after fetch completes
-      });
-    }, 2000);
-    return () => clearTimeout(timeoutId);
+    getData();
   }, []);
 
   useEffect(() => {
@@ -82,6 +87,10 @@ export default function todo(): any {
     setStatusFilter(newStatusFilter);
   };
 
+if (isLoading) {
+  return <CircularProgress />
+}
+
 return (
   <span>
     <ToggleButtonGroup
@@ -98,10 +107,7 @@ return (
     </ToggleButtonGroup>
 
     <div className="todo-list">
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        todos.map((todo) => (
+        { todos.map((todo) => (
           <Card
             key={todo.id}
             sx={{ maxWidth: 345 }}
@@ -121,8 +127,7 @@ return (
               </Button>
             </CardActions>
           </Card>
-        ))
-      )}
+        )) }
     </div>
   </span>
 );

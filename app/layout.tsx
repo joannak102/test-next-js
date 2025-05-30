@@ -30,6 +30,7 @@ export default function RootLayout({
       >
         <div className="top-bar">
           <Link href="/todo">Todo</Link>
+          <Link href="/users">Users</Link>
         </div>
         <div className="content">{children}</div>
       </body>
