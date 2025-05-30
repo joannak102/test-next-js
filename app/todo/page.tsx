@@ -7,7 +7,8 @@ import {
   CardContent,
   Typography,
   ToggleButtonGroup,
-  ToggleButton
+  ToggleButton,
+  CircularProgress
 } from "@mui/material";
 
 export default function todo(): any {
@@ -30,14 +31,24 @@ export default function todo(): any {
   >([]);
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch("https://dummyjson.com/todos")
-      .then((res) => res.json())
-      .then((resp) => {
-        allTodos.current = resp.todos;
-        settodos(allTodos.current);
+    const timeoutId = setTimeout(() => {
+      fetch("https://dummyjson.com/todos")
+        .then((res) => res.json())
+        .then((resp) => {
+          allTodos.current = resp.todos;
+          settodos(allTodos.current);
+        })
+        .catch((error) => {
+        console.error("Failed to fetch todos:", error);
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading after fetch completes
       });
+    }, 2000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
@@ -71,23 +82,26 @@ export default function todo(): any {
     setStatusFilter(newStatusFilter);
   };
 
-  return (
-    <span>
-      <ToggleButtonGroup
-        className="mb-8"
-        color="primary"
-        value={statusFilter}
-        exclusive
-        onChange={handleChange}
-        aria-label="Platform"
-      >
-        <ToggleButton value="completed">Completed</ToggleButton>
-        <ToggleButton value="pending">Pending</ToggleButton>
-        <ToggleButton value="all">All</ToggleButton>
-      </ToggleButtonGroup>
+return (
+  <span>
+    <ToggleButtonGroup
+      className="mb-8"
+      color="primary"
+      value={statusFilter}
+      exclusive
+      onChange={handleChange}
+      aria-label="Platform"
+    >
+      <ToggleButton value="completed">Completed</ToggleButton>
+      <ToggleButton value="pending">Pending</ToggleButton>
+      <ToggleButton value="all">All</ToggleButton>
+    </ToggleButtonGroup>
 
-      <div className="todo-list">
-        {todos.map((todo) => (
+    <div className="todo-list">
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        todos.map((todo) => (
           <Card
             key={todo.id}
             sx={{ maxWidth: 345 }}
@@ -101,12 +115,15 @@ export default function todo(): any {
             <CardActions>
               <Button 
                 size="small"
-                onClick={() =>deleteTask(todo.id)}
-              >Delete</Button>
+                onClick={() => deleteTask(todo.id)}
+              >
+                Delete
+              </Button>
             </CardActions>
           </Card>
-        ))}
-      </div>
-    </span>
-  );
+        ))
+      )}
+    </div>
+  </span>
+);
 }
