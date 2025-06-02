@@ -84,7 +84,7 @@ export default function Users() {
         ))}
       </div>
       <UserContext.Provider value={user}>
-        {open ? <CompanyModal open={true} onClosed={handleOnClose} /> : ""}
+        {open && <CompanyModal open={true} onClosed={handleOnClose} />}
       </UserContext.Provider>
     </span>
   );
